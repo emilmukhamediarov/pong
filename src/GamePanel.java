@@ -8,10 +8,8 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 
 class GamePanel extends JPanel implements KeyListener {
-    private final int WIDTH = 800;
-    private final int HEIGHT = 600;
-
-    private final int BALL_SIZE = 13;
+    private static final int WIDTH = 800;
+    private static final int HEIGHT = 600;
 
     boolean wPressed = false;
     boolean sPressed = false;
@@ -51,6 +49,55 @@ class GamePanel extends JPanel implements KeyListener {
 
     }
 
+    class Ball {
+        public  final int BALL_SIZE = 13;
+        private int x = GamePanel.WIDTH / 2;
+        private int y = GamePanel.HEIGHT / 2;
+        
+        private int velocityX = 3;
+        private int velocityY = 2;
+
+
+        Ball() {}
+
+        public void move() {
+            x += velocityX;
+            y += velocityY;
+            if (hitTop() || hitBottom()) velocityY *= -1;
+            if (collideWith(paddleLeft) || collideWith(paddleRight)) velocityX *= -1;
+        }
+
+        public int getX() {
+            return x;
+        }
+        public int getY() {
+            return y;
+        }
+        public boolean hitTop() {
+            return y <= 0;
+        }
+        public boolean hitBottom() {
+            return y + BALL_SIZE >= GamePanel.HEIGHT;
+        }
+        public boolean collideWith(Paddle p) {
+            int ballLeft = x;
+            int ballRight = x + BALL_SIZE;
+            int ballTop = y;
+            int ballBottom = y + BALL_SIZE;
+
+            int paddleLeft = p.getX();
+            int paddleRight = p.getX() + p.getWidth();
+            int paddleTop = p.getY();
+            int paddleBottom = p.getY() + p.getHeight();
+
+            // Axis-Aligned Bounding Box (AABB) collision detection
+            return ballRight >= paddleLeft &&
+                ballLeft <= paddleRight &&
+                ballBottom >= paddleTop &&
+                ballTop <= paddleBottom;
+            }
+    }
+
     GamePanel() {
         setPreferredSize(new Dimension (WIDTH, HEIGHT));
         setBackground(Color.BLACK);
@@ -65,6 +112,7 @@ class GamePanel extends JPanel implements KeyListener {
                 if(sPressed) paddleLeft.moveDown();
                 if(upPressed) paddleRight.moveUp();
                 if(downPressed) paddleRight.moveDown();
+                ball.move();
                 repaint();
             }
         });
@@ -73,6 +121,7 @@ class GamePanel extends JPanel implements KeyListener {
 
     Paddle paddleLeft = new Paddle(30, 265);
     Paddle paddleRight = new Paddle(770, 265);
+    Ball ball = new Ball();
 
     @Override
         public void keyTyped(KeyEvent e) {}
@@ -99,6 +148,6 @@ class GamePanel extends JPanel implements KeyListener {
         g.setColor(Color.WHITE);
         g.fillRect(paddleLeft.getX(), paddleLeft.getY(), paddleLeft.getWidth(), paddleLeft.getHeight());
         g.fillRect(paddleRight.getX(), paddleRight.getY(), paddleRight.getWidth(), paddleRight.getHeight());
-        g.fillOval(WIDTH/2, HEIGHT/2, BALL_SIZE, BALL_SIZE);
+        g.fillOval(ball.getX(), ball.getY(), ball.BALL_SIZE, ball.BALL_SIZE);
     }
 }

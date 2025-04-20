@@ -10,9 +10,13 @@ class MyFrame extends JFrame {
         setResizable(false);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocation(100, 100);
-        add(new GamePanel());
+        
+        GamePanel panel = new GamePanel();
+        add(panel);
         pack();
         setVisible(true);
+
+        panel.requestFocusInWindow();
     }
 
 }
